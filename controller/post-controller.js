@@ -77,6 +77,7 @@ export const getRegister= async(req,res)=>{
     }
     catch(err){console.log(err);}
 }
+////getuser
 export const getUser= async(req,res)=>{
   console.log(req.body);
    try{const { email, pass } = req.body;
@@ -84,16 +85,22 @@ export const getUser= async(req,res)=>{
    {
      res.status(400).send("All input is required");
    }
-   // Validate if user exist in our database
+   //  Validate if user exist in our database
+   console.log("Body",req.body);
    const userLongin = await User.findOne({ email });
    console.log("bhai idhar");
-   console.log(userLongin);  
+   console.log("id hai bhai",userLongin._id);  
    if(userLongin)
     {
         console.log(pass);
         console.log(userLongin.pass);
     const token=await userLongin.generateAuthToken();
-    res.json(token);
+    res.status(200).json(
+        {
+            token:token,
+            id:userLongin._id
+        }
+        );
     }
     else
     {
@@ -105,46 +112,53 @@ export const getUser= async(req,res)=>{
         console.log(err);
     }
 }
-//  if (user && (await bcrypt.compare(pass, User.pass))) {
-//      const token = jwt.sign(
-//        { user_id: user._id, email },
-//        process.env.TOKEN_KEY,
-//        {
-//          expiresIn: "2h",
-//        }
-//      );
+// deleteUser
+export const deleteUser= async (req,res)=>{
+    
+    try{
+    const {id}=req.body;
+   const response= await post.findByIdAndRemove(id);
+    if(response)
+    res.status(200).send("success")
+    else
+    res.status(500).send("unsuccessful")
+    }
+    catch(e)
+    {
+        console.log(`Cannot Delete`);
+        res.status(500).send("Cannot Delete");
+    }
+}
 
-//      user.token = token;
-
-//      res.status(200).json(user);
-//    }
-
-
-    // const {email,pass}=req.body;
-    // if(!email||!pass)
-    // {   
-    //     return res.status(400).json({error:"fill the field properly"});
-    // }
-    // const userLongin=await User.findOne({email:email});
-    // if(userLongin)
-    // {
-    // const isMatch=await bcrypt.compare(pass,userLongin.pass);
-    // token=await userLongin.generateAuthToken();
-    // res.cookie("jwt",token,
-    // {
-    //     expires:new Date(Date.now()+258920000),
-    //     httpOnly:true,
-    // });
-    // if(!isMatch)
-    // {
-    //     res.status(400).json({error:"Invalid Credentials "});
-    // }
-    // else
-    // {
-    //     res.json({message:"user Singnedin Successfully"});
-    // }
-    // }
-    // else
-    // {
-    //     res.status(400).json({error:"Invalid Credentials"});
-    // }
+//getname
+export const getName= async (req,res)=>{
+    try{
+         console.log('hey',req.body.id);
+         const name = await User.findById(req.body.id);
+         console.log('name',name);
+         const n =name.fName;
+         res.status(200).json(
+            {
+               n
+            });
+    }
+    catch(e){
+      console.log('error',e);
+    }
+}
+//inquery
+export const getInquiry= async (req,res)=>{
+    try{
+         const name = await post.findById(req.body.id);
+         console.log(name.username);
+         const n =name.username;
+         res.status(200).json(
+            {
+               n
+            });
+    }
+    catch(e){
+      console.log('error',e);
+    }
+}
+    
